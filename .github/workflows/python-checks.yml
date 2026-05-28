@@ -1,0 +1,27 @@
+name: Python checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run RAG answer evaluation
+        run: |
+          PYTHONPATH=src python examples/rag_answer_evaluation.py
+      - name: Run retrieval quality report
+        run: |
+          PYTHONPATH=src python examples/retrieval_quality_report.py
+      - name: Run hallucination risk report
+        run: |
+          PYTHONPATH=src python examples/hallucination_risk_report.py
