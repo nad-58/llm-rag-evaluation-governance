@@ -12,16 +12,18 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install dependencies
+      - name: Install package and tools
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: Run RAG answer evaluation
+          pip install -e .[dev]
+      - name: Compile sources
+        run: python -m compileall -q src examples tests
+      - name: Run tests
+        run: python -m pytest tests -q
+      - name: Run examples
         run: |
-          PYTHONPATH=src python examples/rag_answer_evaluation.py
-      - name: Run retrieval quality report
-        run: |
-          PYTHONPATH=src python examples/retrieval_quality_report.py
-      - name: Run hallucination risk report
-        run: |
-          PYTHONPATH=src python examples/hallucination_risk_report.py
+          python examples/rag_answer_evaluation.py
+          python examples/retrieval_quality_report.py
+          python examples/hallucination_risk_report.py
+      - name: Audit dependencies
+        run: pip-audit
