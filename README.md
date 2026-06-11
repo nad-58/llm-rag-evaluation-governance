@@ -10,7 +10,7 @@ This repository uses **synthetic examples and generic templates only**. It does 
 
 LLM and RAG systems can produce fluent answers that appear correct but may be incomplete, unsupported, poorly grounded, or unsuitable for high-impact workflows. Governance requires structured evaluation evidence, human oversight, monitoring, and clear acceptance criteria.
 
-This project provides lightweight utilities, examples, documents, and templates for reviewing whether an LLM/RAG system is ready for controlled use.
+This project provides lightweight utilities, examples, documents, templates, tests, and package metadata for reviewing whether an LLM/RAG system is ready for controlled use.
 
 ## Evaluation lifecycle
 
@@ -42,8 +42,11 @@ Monitoring, feedback, and re-evaluation
 llm-rag-evaluation-governance/
 ├── README.md
 ├── LICENSE
+├── pyproject.toml
 ├── requirements.txt
+├── requirements-dev.txt
 ├── src/rag_eval/
+│   ├── __init__.py
 │   ├── groundedness.py
 │   ├── retrieval_quality.py
 │   ├── hallucination_risk.py
@@ -53,23 +56,52 @@ llm-rag-evaluation-governance/
 │   ├── rag_answer_evaluation.py
 │   ├── retrieval_quality_report.py
 │   └── hallucination_risk_report.py
+├── tests/
+│   ├── test_metrics.py
+│   └── test_risk_and_review.py
 ├── docs/
-│   ├── llm-rag-lifecycle.md
-│   ├── text-llm-evaluation-workflow.md
-│   ├── automated-vs-manual-evaluation.md
-│   ├── groundedness-and-traceability.md
-│   ├── hallucination-risk-management.md
-│   ├── prompt-robustness.md
-│   ├── human-oversight-for-genai.md
-│   └── monitoring-and-feedback.md
-└── templates/
-    ├── rag-evaluation-checklist.md
-    ├── metric-threshold-pass-rate-template.md
-    ├── human-annotation-template.md
-    ├── prompt-risk-register.md
-    ├── genai-model-card.md
-    └── human-review-policy.md
+├── templates/
+└── .github/
+    ├── dependabot.yml
+    └── workflows/python-checks.yml
 ```
+
+## Installation
+
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+python -m pip install -e ".[dev]"
+```
+
+## Quick start
+
+```bash
+python examples/rag_answer_evaluation.py
+python examples/retrieval_quality_report.py
+python examples/hallucination_risk_report.py
+```
+
+## Run validation locally
+
+```bash
+python -m compileall -q src examples tests
+python -m pytest tests -q
+pip-audit
+```
+
+GitHub Actions runs the same compile, test, example, and dependency-audit checks on every push and pull request.
+
+## Current automated test coverage
+
+The current tests check:
+
+- groundedness score calculation and threshold decisions;
+- retrieval recall and top-k relevance;
+- unsupported-claim ratios;
+- hallucination-risk classification;
+- human-review escalation logic;
+- invalid claim-count handling.
 
 ## Documentation guide
 
@@ -109,14 +141,9 @@ llm-rag-evaluation-governance/
 | Human oversight | Does the workflow require review, escalation, or approval? |
 | Monitoring | Are feedback, failures, and drift signals reviewed after release? |
 
-## Quick start
+## Dependency maintenance
 
-```bash
-pip install -r requirements.txt
-PYTHONPATH=src python examples/rag_answer_evaluation.py
-PYTHONPATH=src python examples/retrieval_quality_report.py
-PYTHONPATH=src python examples/hallucination_risk_report.py
-```
+Dependabot checks both Python packages and GitHub Actions weekly. CI also runs `pip-audit` to detect known vulnerabilities in installed dependencies.
 
 ## Example use cases
 
